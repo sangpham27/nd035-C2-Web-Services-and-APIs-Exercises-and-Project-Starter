@@ -4,9 +4,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -121,6 +119,44 @@ public class CarControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.details.model", is(car.getDetails().getModel())));
+    }
+
+    /**
+     * Tests the updation of the car by ID
+     * @throws Exception if the operations fails
+     */
+    @Test
+    public void updateCar() throws Exception {
+
+        Car car = getCarById();
+        mvc.perform(
+                        put("/cars/{id}", 1)
+                                .content(json.write(car).getJson())
+                                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .characterEncoding("UTF-8"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(json.write(car).getJson()));
+    }
+
+    private Car getCarById() {
+        Car car = getCar();
+        car.setId(1L);
+        Details details = new Details();
+        Manufacturer manufacturer = new Manufacturer(101, "Chevrolet");
+        details.setManufacturer(manufacturer);
+        details.setModel("Impala");
+        details.setBody("sedan");
+        details.setMileage(32280);
+        details.setExternalColor("white");
+        details.setBody("sedan");
+        details.setEngine("3.6L V6");
+        details.setFuelType("Gasoline");
+        details.setModelYear(2018);
+        details.setProductionYear(2018);
+        details.setNumberOfDoors(4);
+        car.setDetails(details);
+        return car;
     }
 
     /**
